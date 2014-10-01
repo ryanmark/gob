@@ -1,1 +1,10 @@
-flask
+Flask==0.10.1
+GitPython==0.3.2.RC1
+Jinja2==2.7.3
+MarkupSafe==0.23
+Werkzeug==0.9.6
+async==0.6.1
+gitdb==0.5.4
+itsdangerous==0.24
+smmap==0.8.2
+wsgiref==0.1.2

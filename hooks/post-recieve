@@ -1,15 +1,6 @@
 #!/bin/bash
-APP_NAME=$(basename "$PWD") 
+APP_NAME=$(basename "$PWD")
 echo $APP_NAME
-echo $PWD
-while read oldrev newrev refname
-do
-    branch=$(git rev-parse --symbolic --abbrev-ref $refname)
-    unset GIT_DIR
-    cd ../../
-    if [ -d $HOME/.rbenv ]; then
-      export PATH="$HOME/.rbenv/bin:$PATH"
-      eval "$(rbenv init -)"
-    fi
-    export PATH=/usr/local/bin:$PATH
-done
+
+# Check for the config file and run script, check that the run script is
+# executable, check that the config file is valid JSON and display a message.
