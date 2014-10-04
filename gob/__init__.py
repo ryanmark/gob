@@ -7,6 +7,6 @@ WORKING_PATH = os.path.join(DATA_PATH, 'working')
 JOB_PATH = os.path.join(DATA_PATH, 'jobs')
 
 from flask import Flask
-app = Flask(__name__)
+application = app = Flask(__name__)
 
 import views

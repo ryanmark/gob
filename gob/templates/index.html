@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% block body %}
+  <div id="nav">
     <div class="navbar navbar-inverse" role="navigation">
       <div class="container-fluid">
         <div class="navbar-header">
@@ -24,24 +25,7 @@
         </div>
       </div>
     </div>
+  </div>
 
-    <div class="container-fluid">
-      <div class="row">
-        <div class="col-sm-6 col-sm-offset-3 col-md-8 col-md-offset-2">
-          <h3>Apps</h3>
-          <a class="btn btn-default" data-role="add-app">Add app</a>
-          {% for app in apps %}
-          <div class="media">
-            <a class="pull-left" href="#">
-              <img class="media-object" src="{{ app.thumb }}" alt="{{ app.title }}">
-            </a>
-            <div class="media-body">
-              <h4 class="media-heading">{{ app.title or app.name }}</h4>
-              {{ app.description }}
-            </div>
-          </div>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
+  <div id="main"></div>
 {% endblock %}
