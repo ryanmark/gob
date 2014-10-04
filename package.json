@@ -1,0 +1,38 @@
+{
+  "name": "gob",
+  "version": "0.0.0",
+  "description": "Super Alpha",
+  "main": "./lib/gob/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ryanmark/gob.git"
+  },
+  "author": "Ryan Mark",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ryanmark/gob/issues"
+  },
+  "homepage": "https://github.com/ryanmark/gob",
+  "dependencies": {
+    "jquery": "~2.1.1",
+    "underscore": "~1.7.0",
+    "backbone": "~1.1.2",
+    "bootstrap": "~3.2.0"
+  },
+  "devDependencies": {
+    "browserify": "~5.12.1",
+    "watchify": "~1.0.6",
+    "node-underscorify": "ryanmark/node-underscorify"
+  },
+  "browserify": {
+    "transform": [
+      ["node-underscorify", {
+        "extensions": ["ejs"],
+        "requires": [{"variable": "_", "module": "underscore"}]
+      }]
+    ]
+  }
+}
