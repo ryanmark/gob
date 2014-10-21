@@ -24,15 +24,27 @@
   },
   "devDependencies": {
     "browserify": "~5.12.1",
+    "browserify-shim": "~3.8.0",
     "watchify": "~1.0.6",
     "node-underscorify": "ryanmark/node-underscorify"
+  },
+  "browser": {
+    "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js"
   },
   "browserify": {
     "transform": [
       ["node-underscorify", {
         "extensions": ["ejs"],
         "requires": [{"variable": "_", "module": "underscore"}]
-      }]
+      }],
+      "browserify-shim"
     ]
+  },
+  "browserify-shim": {
+    "bootstrap": {
+      "depends": [
+        "jquery:jQuery"
+      ]
+    }
   }
 }

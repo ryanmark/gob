@@ -16,6 +16,8 @@ def index():
 
 @app.route("/apps", methods=['GET'])
 def list_apps():
+    if not request_wants_json():
+        return index()
     return json.dumps(models.all_apps()), 200, HEDS
 
 
@@ -35,6 +37,8 @@ def create_app():
 
 @app.route("/apps/<name>", methods=['GET'])
 def show_app(name):
+    if not request_wants_json():
+        return index()
     return jsonify(models.get_app_or_404(name))
 
 
@@ -55,8 +59,16 @@ def delete_app(name):
     return 'Deleted', 204, []
 
 
+@app.route("/apps/<name>/new-job")
+def new_app(name):
+    return index()
+
+
 @app.route("/apps/<name>/jobs", methods=['GET'])
 def list_job(name):
+    if not request_wants_json():
+        return index()
+
     if not models.is_app_ready(name):
         return json.dumps({'error': 'App is not ready'}), 400, HEDS
 
@@ -76,6 +88,8 @@ def create_job(name):
 
 @app.route("/apps/<name>/jobs/<slug>", methods=['GET'])
 def show_job(name, slug):
+    if not request_wants_json():
+        return index()
     return jsonify(models.get_job_or_404(name, slug))
 
 
@@ -90,3 +104,16 @@ def run_job(name, slug):
         json.dumps(app_config).replace('"', '\\"'))
     return check_output(cmd, shell=True)
     return jsonify(models.get_job_or_404(name, slug))
+
+
+@app.route("/apps/<name>/jobs/<slug>/edit")
+def edit_job(name, slug):
+    return index()
+
+
+def request_wants_json():
+    best = request.accept_mimetypes \
+        .best_match(['application/json', 'text/html'])
+    return best == 'application/json' and \
+        request.accept_mimetypes[best] > \
+        request.accept_mimetypes['text/html']

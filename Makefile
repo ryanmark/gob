@@ -20,10 +20,8 @@ build:
 	@echo "\nDone!"
 
 server:
-ifndef VIRTUALENV
-	source $(env)/bin/activate
-endif
 	@echo "\nStarting watchers and dev server...\n"
 	(./node_modules/.bin/watchify application.js -o gob/static/app.js -v &)
-	python application.py
+	(./run_server.sh &)
+	$(env)/bin/python application.py
 	@echo "\nDone!"

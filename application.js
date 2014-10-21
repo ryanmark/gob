@@ -4,13 +4,10 @@ var $ = require('jquery'),
 
 Backbone.$ = $;
 
-// Configure helpers and partials for handlebars
-var Handlebars = require("hbsfy/runtime");
-Handlebars.registerHelper(require('./lib/gob/helpers'));
+var bootstrap = require('bootstrap');
 
 // Load our components and run the app
-var models = require('./lib/gob/models'),
-    Router = require('./lib/gob/router');
+var Router = require('./lib/gob/router');
 
 var router = new Router();
 
