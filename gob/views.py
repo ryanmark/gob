@@ -24,6 +24,7 @@ def list_apps():
 @app.route("/apps", methods=['POST'])
 def create_app():
     data = request.get_json()
+    print data
 
     try:
         ret = models.create_app(data['name'])

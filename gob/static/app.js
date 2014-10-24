@@ -79,6 +79,13 @@ module.exports = Backbone.Router.extend({
     apps.fetch().success(function() {
       var view = new views.ListApps({collection: apps});
       display(view);
+      view.$el.find('form#new-app').submit(function(eve) {
+        eve.preventDefault();
+        var new_app = new models.App({name: $(this).find('input#name').val()});
+        new_app.save().success(function() {
+          apps.fetch();
+        });
+      });
     });
   },
 
@@ -198,9 +205,15 @@ var __t,__p='',__j=Array.prototype.join,print=function(){__p+=__j.call(arguments
 with(obj||{}){
 __p+='<h3>Jobs for '+
 ((__t=( app.attributes.name ))==null?'':__t)+
-'</h3>\n<a href="/apps/'+
-((__t=( app.attributes.name ))==null?'':__t)+
-'/new-job" class="btn btn-default">New job</a>\n';
+'</h3>\n<button id="new-job" class="btn btn-primary" data-toggle="modal" data-target="#newJobModal">\n  New job\n</button>\n\n';
+ _.each(models, function(item) { 
+__p+='\n  <div class="media">\n    <div class="media-body">\n      <h4 class="media-heading">\n        '+
+((__t=( item.attributes.name ))==null?'':__t)+
+'\n      <p>'+
+((__t=( item.attributes.description ))==null?'':__t)+
+'</p>\n    </div>\n  </div>\n';
+ }) 
+__p+='\n\n<!-- Modal -->\n<div class="modal fade" id="newJobModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n    <div class="modal-content">\n      <form id="new-app" role="form">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>\n        <h4 class="modal-title" id="myModalLabel">New Job</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label for="exampleInputEmail1">Name of the new app</label>\n          <input type="text" required class="form-control"\n                 id="name" name="name" placeholder="Enter name"\n                 pattern="[a-z]([-_]?[a-z0-9]+){2,}">\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n        <button type="submit" class="btn btn-primary">Save changes</button>\n      </div>\n      </form>\n    </div>\n  </div>\n</div>\n';
 }
 return __p;
 };

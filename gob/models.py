@@ -33,7 +33,7 @@ def get_app(name):
                 'status': 'error',
                 'error': 'The JSON config file has problems'
             }
-    except KeyError:
+    except (KeyError, ValueError):
         data = {'status': 'setup'}
 
     data['name'] = name
@@ -63,19 +63,19 @@ def get_app_thumb_or_404(name):
     return _or_404(get_app_thumb, args=[name])
 
 
-def create_app(data):
-    if os.path.isdir(utils.repo_path(data['name'])):
-        raise AlreadyExists("The app '%s' already exists" % data['name'])
+def create_app(name):
+    if os.path.isdir(utils.repo_path(name)):
+        raise AlreadyExists("The app '%s' already exists" % name)
 
-    repo = git.Repo.init(utils.repo_path(data['name']), bare=True, shared=True)
-    with repo.config_writer() as config:
-        config.set('receive', 'denyNonFastForwards', False)
-        config.write()
+    repo = git.Repo.init(utils.repo_path(name), bare=True, shared=True)
+    config = repo.config_writer()
+    config.set('receive', 'denyNonFastForwards', False)
+    config.write()
     os.symlink(
         os.path.join(APP_PATH, 'hooks', 'post-receive'),
-        os.path.join(utils.repo_path(data['name']), 'hooks', 'post-receive'))
+        os.path.join(utils.repo_path(name), 'hooks', 'post-receive'))
 
-    return get_app(data['name'])
+    return get_app(name)
 
 
 def is_app_ready(name):
