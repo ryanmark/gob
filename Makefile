@@ -21,7 +21,5 @@ build:
 
 server:
 	@echo "\nStarting watchers and dev server...\n"
-	(./node_modules/.bin/watchify application.js -o gob/static/app.js -v &)
-	(./run_server.sh &)
-	$(env)/bin/python application.py
+	VIRTUAL_ENV=$(env) ./devserver.sh
 	@echo "\nDone!"

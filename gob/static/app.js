@@ -76,23 +76,16 @@ module.exports = Backbone.Router.extend({
   listApps: function() {
     console.log("listApps");
     var apps = this.apps = new models.AppCollection();
-    apps.fetch().success(function() {
+    apps.fetch().always(function() {
       var view = new views.ListApps({collection: apps});
       display(view);
-      view.$el.find('form#new-app').submit(function(eve) {
-        eve.preventDefault();
-        var new_app = new models.App({name: $(this).find('input#name').val()});
-        new_app.save().success(function() {
-          apps.fetch();
-        });
-      });
     });
   },
 
   showApp: function(name) {
     console.log("showApp");
     var app = new models.App({id: name});
-    app.fetch().success(function() {
+    app.fetch().always(function() {
       var view = new views.ShowApp({model: app})
       display(view);
     });
@@ -101,19 +94,35 @@ module.exports = Backbone.Router.extend({
   listJobs: function(name) {
     console.log("listJobs");
     var app = new models.App({id: name});
-    app.fetch().success(function() {
-      app.jobs.fetch().success(function() {
+    app.fetch().always(function() {
+      app.jobs.fetch().always(function() {
         var view = new views.ListJobs({collection: app.jobs})
         display(view);
       });
     });
   },
 
+  newJob: function(name, slug) {
+    console.log("newJob");
+    var job = new models.Job({app_name: name});
+    var view = new views.EditJob({model: job})
+    display(view);
+  },
+
   showJob: function(name, slug) {
     console.log("showJob");
     var job = new models.Job({app_name: name, slug: slug});
-    job.fetch().success(function() {
+    job.fetch().always(function() {
       var view = new views.ShowJob({model: job})
+      display(view);
+    });
+  },
+
+  editJob: function(name, slug) {
+    console.log("editJob");
+    var job = new models.job({app_name: name, slug: slug});
+    job.fetch().always(function() {
+      var view = new views.EditJob({model: job})
       display(view);
     });
   },
@@ -161,9 +170,9 @@ __p+='\n  <div class="media">\n    <a class="pull-left" href="/apps/'+
 ((__t=( item.attributes.name ))==null?'':__t)+
 '">\n      <img class="media-object" src="/apps/'+
 ((__t=( item.attributes.name ))==null?'':__t)+
-'/thumb" alt="'+
+'/thumb"\n           alt="'+
 ((__t=( item.attributes.title ))==null?'':__t)+
-'" width="200">\n    </a>\n    <div class="media-body">\n      <h4 class="media-heading">\n        '+
+'" height="200" width="355">\n    </a>\n    <div class="media-body">\n      <h4 class="media-heading">\n        '+
 ((__t=( item.attributes.name ))==null?'':__t)+
 '\n        ';
  if(item.attributes.status == 'ready') { 
@@ -179,9 +188,11 @@ __p+='</h4>\n      <p><strong>Repo:</strong> <input value="'+
 ((__t=( item.attributes.repo_url ))==null?'':__t)+
 '"></p>\n      <p>'+
 ((__t=( item.attributes.description ))==null?'':__t)+
-'</p>\n    </div>\n  </div>\n';
+'</p>\n      <p><button class="btn btn-danger"\n                 data-action="delete" data-model="App"\n                 data-model-id="'+
+((__t=( item.attributes.name ))==null?'':__t)+
+'">\n        Delete</button></p>\n    </div>\n  </div>\n';
  }) 
-__p+='\n\n<!-- Modal -->\n<div class="modal fade" id="newAppModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n    <div class="modal-content">\n      <form id="new-app" role="form">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>\n        <h4 class="modal-title" id="myModalLabel">New App</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label for="exampleInputEmail1">Name of the new app</label>\n          <input type="text" required class="form-control"\n                 id="name" name="name" placeholder="Enter name"\n                 pattern="[a-z]([-_]?[a-z0-9]+){2,}">\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n        <button type="submit" class="btn btn-primary">Save changes</button>\n      </div>\n      </form>\n    </div>\n  </div>\n</div>\n';
+__p+='\n\n<!-- Modal -->\n<div class="modal fade" id="newAppModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">\n  <div class="modal-dialog">\n    <div class="modal-content">\n      <form id="new-app" role="form" data-model="App" data-action="new">\n      <div class="modal-header">\n        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>\n        <h4 class="modal-title" id="myModalLabel">New App</h4>\n      </div>\n      <div class="modal-body">\n        <div class="form-group">\n          <label for="exampleInputEmail1">Name of the new app</label>\n          <input type="text" required class="form-control"\n                 id="name" name="name" placeholder="Enter name"\n                 pattern="[a-z]([-_]?[a-z0-9]+){2,}">\n        </div>\n      </div>\n      <div class="modal-footer">\n        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>\n        <button type="submit" class="btn btn-primary">Save changes</button>\n      </div>\n      </form>\n    </div>\n  </div>\n</div>\n';
 }
 return __p;
 };
@@ -229,6 +240,9 @@ var $ = require('jquery'),
 module.exports = {
   ListApps: BaseView.extend({
     template: require('./templates/app_list.ejs'),
+    beforeRender: function() {
+      $('.modal').modal('hide');
+    }
   }),
   ShowApp: BaseView.extend({
     template: require('./templates/app.ejs'),
@@ -251,29 +265,30 @@ var $ = require('jquery'),
     Backbone = require('backbone'),
     models = require('../models');
 
-function isathing(thing) {
-  return typeof(thing) != 'undefined';
-}
-
 module.exports = Backbone.View.extend({
   events: {
-    'click a': 'handleLink'
+    'click a': 'handleLink',
+    'submit form': 'handleForm',
+    'click button[data-action=delete]': 'handleDelete'
   },
 
-  initialize: function(args) {
-    if(isathing(this.beforeInit))
-      this.beforeInit(args);
+  initialize: function() {
+    var args = Array.prototype.slice.call(arguments);
+    this.hook('beforeInit', args);
 
-    if(isathing(this.render)) {
-      if(isathing(this.collection))
-        this.collection.on("sync", this.render, this);
-      else if(isathing(this.model))
-        this.model.on("sync", this.render, this);
-      this.render();
-    }
+    if(_.isObject(this.collection))
+      this.collection
+        .on("sync sort", this.render, this)
+        .on("error", this.logError, this);
 
-    if(isathing(this.afterInit))
-      this.afterInit(args);
+    if(_.isObject(this.model))
+      this.model
+        .on("sync change", this.render, this)
+        .on("error", this.logError, this);
+
+    this.render();
+
+    this.hook('afterInit', args);
   },
 
   handleLink: function(eve) {
@@ -284,21 +299,92 @@ module.exports = Backbone.View.extend({
       {trigger: true});
   },
 
-  render: function() {
-    var obj;
-    if(isathing(this.collection)) obj = this.collection;
-    else if(isathing(this.model)) obj = this.model;
+  handleForm: function(eve) {
+    eve.preventDefault();
+    var inst, model,
+        fields = new Object,
+        $form = $(eve.currentTarget),
+        model_class = $form.data('model'),
+        model_id = $form.data('model-id'),
+        action = $form.data('action');
 
-    if(isathing(this.beforeRender))
-      this.beforeRender(obj);
+    _.each($form.find(":input").serializeArray(), function(i) { fields[i.name] = i.value; });
 
-    console.log(obj);
-    this.$el.html(this.template(obj));
+    if(model_class) {
+      if(action == 'new') {
+        model = models[model_class];
+        this.hook('beforeSubmit', $form, fields, action, model);
+        inst = new model;
+      } else return this.render();
+    } else if(_.isObject(this.model)) {
+      if(action == 'edit') {
+        this.hook('beforeSubmit', $form, fields, action, this.model);
+        inst = this.model
+      } else return this.render();
+    } else return this.render();
 
-    if(isathing(this.afterRender))
-      this.afterRender(obj);
+    console.log(fields);
+    inst.set(fields);
+    if(!inst.isValid()) return this.render();
+
+    inst.save()
+      .done(_.bind(function() {
+        if(_.isObject(this.collection))
+          this.collection.fetch();
+        else if(_.isObject(this.model))
+          this.model.fetch();
+        else
+          this.render();
+      }, this))
+      .fail(_.bind(function(promise, status, error){
+        $form.parent('.modal').modal('close');
+        console.log("SAVE FAILED!!");
+        console.log(status, error);
+        this.render();
+      }, this));
 
     return this;
+  },
+
+  handleDelete: function(eve) {
+    var inst,
+        $btn = $(eve.currentTarget),
+        model_class = $btn.data('model'),
+        model_id = $btn.data('model-id');
+
+    if(confirm('Are you sure you want to delete this?')) {
+      inst = new models[model_class]({id: model_id});
+      inst.destroy();
+      this._model_or_collection().fetch();
+    }
+  },
+
+  render: function() {
+    var obj = this._model_or_collection();
+
+    this.hook('beforeRender', obj);
+
+    this.$el.html(this.template(obj));
+
+    this.hook('afterRender', obj);
+
+    return this;
+  },
+
+  logError: function(model_or_collection, resp, options) {
+    console.log(arguments);
+  },
+
+  hook: function() {
+    var args = Array.prototype.slice.call(arguments),
+        name = args.shift();
+    this.trigger(name, args);
+    if(_.isFunction(this[name])) return this[name](args);
+  },
+
+  _model_or_collection: function() {
+    if(_.isObject(this.collection)) return this.collection;
+    else if(_.isObject(this.model)) return this.model;
   }
 });
 

@@ -3,6 +3,7 @@ from glob import iglob
 from flask import json, abort
 from os.path import basename, dirname, splitext
 import os
+import shutil
 import git
 
 
@@ -41,8 +42,9 @@ def get_app(name):
     return data
 
 
-def get_app_or_404(name):
-    return _or_404(get_app, args=[name])
+def delete_app(name):
+    get_app(name)
+    shutil.rmtree(utils.repo_path(name))
 
 
 def get_app_thumb(name):
@@ -57,6 +59,14 @@ def get_app_thumb(name):
     except KeyError:
         raise DoesNotExist(
             "The file '%s' does not exist in the app repo" % app['thumb'])
+
+
+def get_app_or_404(name):
+    return _or_404(get_app, args=[name])
+
+
+def delete_app_or_404(name):
+    return _or_404(delete_app, args=[name])
 
 
 def get_app_thumb_or_404(name):

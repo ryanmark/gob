@@ -1,10 +1,8 @@
-import os
-import shutil
 import mimetypes
 from subprocess import check_output
-from flask import render_template, request, jsonify, json
+from flask import render_template, request, jsonify, json, redirect
 
-from gob import app, models, utils
+from gob import app, models
 
 HEDS = {'Content-Type': 'application/json'}
 
@@ -45,18 +43,18 @@ def show_app(name):
 
 @app.route("/apps/<name>/thumb", methods=['GET'])
 def app_thumb(name):
-    app = models.get_app_or_404(name)
-    thumb = models.get_app_thumb_or_404(name).read()
-    mimetype = mimetypes.guess_type(app['thumb'])[0]
-    print mimetype
-    return thumb, 200, {'Content-Type': mimetype}
+    try:
+        app = models.get_app(name)
+        thumb = models.get_app_thumb(name).read()
+        mimetype = mimetypes.guess_type(app['thumb'])[0]
+        return thumb, 200, {'Content-Type': mimetype}
+    except models.DoesNotExist:
+        return redirect('/static/gray.gif')
 
 
 @app.route("/apps/<name>", methods=['DELETE'])
 def delete_app(name):
-    models.get_app_or_404(name)
-    shutil.rmtree(utils.repo_path(name))
-    os.unlink(utils.repo_json_path(name))
+    models.delete_app_or_404(name)
     return 'Deleted', 204, []
 
 
