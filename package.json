@@ -29,7 +29,8 @@
     "node-underscorify": "ryanmark/node-underscorify"
   },
   "browser": {
-    "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js"
+    "bootstrap": "./node_modules/bootstrap/dist/js/bootstrap.js",
+    "alpaca": "./gob/static/alpaca/js/alpaca.js"
   },
   "browserify": {
     "transform": [
@@ -42,6 +43,11 @@
   },
   "browserify-shim": {
     "bootstrap": {
+      "depends": [
+        "jquery:jQuery"
+      ]
+    },
+    "alpaca": {
       "depends": [
         "jquery:jQuery"
       ]

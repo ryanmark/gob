@@ -4,7 +4,8 @@ var $ = require('jquery'),
 
 Backbone.$ = $;
 
-var bootstrap = require('bootstrap');
+var bootstrap = require('bootstrap'),
+    alpaca = require('alpaca');
 
 // Load our components and run the app
 var Router = require('./lib/gob/router');
